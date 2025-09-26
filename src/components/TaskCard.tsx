@@ -49,8 +49,14 @@ const priorityConfig = {
 export function TaskCard({ task, onStart, onComplete, onBreakdown }: TaskCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  const difficulty = difficultyConfig[task.difficulty];
-  const priority = priorityConfig[task.priority];
+  // Safety check for task object
+  if (!task || typeof task !== 'object') {
+    return null;
+  }
+  
+  // Safety checks for configuration objects
+  const difficulty = difficultyConfig[task.difficulty] || difficultyConfig[2]; // Default to medium
+  const priority = priorityConfig[task.priority] || priorityConfig[2]; // Default to medium
 
   const formatTime = (minutes: number) => {
     if (minutes < 60) return `${minutes}m`;
@@ -63,7 +69,7 @@ export function TaskCard({ task, onStart, onComplete, onBreakdown }: TaskCardPro
     <Card 
       className={`
         w-full transition-all duration-300 hover:shadow-gentle hover:scale-[1.01]
-        border-l-4 ${priority.color}
+        border-l-4 ${priority?.color || 'border-l-gray-300'}
         ${task.completed ? 'opacity-60 bg-success-gentle/10' : ''}
       `}
     >
@@ -72,21 +78,21 @@ export function TaskCard({ task, onStart, onComplete, onBreakdown }: TaskCardPro
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <Badge variant="secondary" className="text-xs">
-                {task.category}
+                {task.category || 'Uncategorized'}
               </Badge>
               <Badge 
-                className={`text-xs text-white ${difficulty.color}`}
+                className={`text-xs text-white ${difficulty?.color || 'bg-gray-500'}`}
               >
-                {difficulty.icon} {difficulty.label}
+                {difficulty?.icon || '📝'} {difficulty?.label || 'Unknown'}
               </Badge>
             </div>
             
             <CardTitle className={`text-lg ${task.completed ? 'line-through text-muted-foreground' : 'text-ocean-deep'}`}>
-              {task.title}
+              {task.title || 'Untitled Task'}
             </CardTitle>
             
             <CardDescription className="mt-1">
-              {task.description}
+              {task.description || 'No description provided'}
             </CardDescription>
           </div>
           
@@ -98,7 +104,7 @@ export function TaskCard({ task, onStart, onComplete, onBreakdown }: TaskCardPro
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
-            {formatTime(task.estimatedTime)}
+            {formatTime(task.estimatedTime || 0)}
           </div>
           
           {task.dueDate && (
@@ -110,7 +116,7 @@ export function TaskCard({ task, onStart, onComplete, onBreakdown }: TaskCardPro
           
           <div className="flex items-center gap-1">
             <Target className="w-3 h-3" />
-            {priority.label} Priority
+            {priority?.label || 'Unknown'} Priority
           </div>
         </div>
       </CardHeader>

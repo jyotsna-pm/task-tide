@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Target, Zap, Plus } from "lucide-react";
+import { Calendar, Clock, Target, Zap, Plus, Mic } from "lucide-react";
 import { Task } from "@/components/TaskCard";
 
 interface AddTaskModalProps {
@@ -115,25 +115,47 @@ export function AddTaskModal({ open, onOpenChange, onAddTask }: AddTaskModalProp
           <div className="space-y-4">
             <div>
               <Label htmlFor="title" className="text-ocean-deep">Task Title *</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="What needs to be done?"
-                className="mt-1"
-                required
-              />
+              <div className="relative mt-1">
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="What needs to be done?"
+                  className="pr-10"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 text-muted-foreground hover:text-primary"
+                  title="Voice input (coming soon)"
+                >
+                  <Mic className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
 
             <div>
               <Label htmlFor="description" className="text-ocean-deep">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Add more details about this task..."
-                className="mt-1 min-h-[80px]"
-              />
+              <div className="relative mt-1">
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Add more details about this task..."
+                  className="min-h-[80px] pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-2 h-6 w-6 p-0 text-muted-foreground hover:text-primary"
+                  title="Voice input (coming soon)"
+                >
+                  <Mic className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
 

@@ -56,6 +56,13 @@ const Index = () => {
   const [userGoals, setUserGoals] = useState<string[]>([]);
   const [currentStreak, setCurrentStreak] = useState(3);
   const [todayProgress, setTodayProgress] = useState({ completed: 2, total: 3 });
+  const [reflectionData, setReflectionData] = useState<{
+    eveningMood: number;
+    reflection: string;
+    challenges?: string;
+    tomorrowPriority: string;
+    gratitude: string;
+  } | null>(null);
   const { toast } = useToast();
 
   // Debug: Monitor appState changes
@@ -230,6 +237,35 @@ const Index = () => {
     });
   };
 
+  const handleReflectionComplete = (data: {
+    eveningMood: number;
+    reflection: string;
+    challenges: string;
+    tomorrowPriority: string;
+    gratitude: string;
+    skipReflection: boolean;
+  }) => {
+    setReflectionData({
+      eveningMood: data.eveningMood,
+      reflection: data.reflection,
+      tomorrowPriority: data.tomorrowPriority,
+      gratitude: data.gratitude
+    });
+    
+    // Save reflection data to localStorage
+    const today = new Date().toDateString();
+    localStorage.setItem(`reflection_${today}`, JSON.stringify(data));
+    
+    // Show success message
+    toast({
+      title: data.skipReflection ? "Good Night! 🌙" : "Reflection Complete! ✨",
+      description: data.skipReflection ? "Sweet dreams!" : "Thank you for taking time to reflect. Sleep well!",
+    });
+    
+    // Return to dashboard
+    setAppState("dashboard");
+  };
+
   // Helper functions
   const getTimeOfDay = () => {
     const hour = new Date().getHours();
@@ -279,8 +315,30 @@ const Index = () => {
         );
 
       case "dashboard":
+        // Helper function to check if a task is due today
+        const isToday = (date: string | undefined) => {
+          if (!date) return false;
+          
+          // Handle special string cases
+          if (date.toLowerCase() === "today") return true;
+          
+          // Handle actual date strings
+          try {
+            const today = new Date();
+            const taskDate = new Date(date);
+            return taskDate.toDateString() === today.toDateString();
+          } catch {
+            return false;
+          }
+        };
+
+        // Today's Focus: tasks due today, high priority tasks, or tasks without due dates
         const todaysTasks = tasks.filter(task => 
-          !task.completed && new Date(task.dueDate).toDateString() === new Date().toDateString()
+          !task.completed && (
+            isToday(task.dueDate) || // Tasks due today
+            task.priority === 1 || // High priority tasks
+            !task.dueDate // Tasks without due dates (general tasks)
+          )
         ).slice(0, 3);
 
         return (
@@ -469,6 +527,10 @@ const Index = () => {
                 }
                 if (view === "dashboard") setAppState("dashboard");
                 if (view === "add-task-modal") setShowAddTaskModal(true);
+                if (view === "reflection") {
+                  console.log('Setting appState to reflection');
+                  setAppState("reflection");
+                }
                 if (view === "profile") {
                   toast({
                     title: "Profile",
@@ -541,7 +603,8 @@ const Index = () => {
             currentStreak={currentStreak}
             morningMood={currentMood}
             completedTaskTitles={tasks.filter(t => t.completed).map(t => t.title)}
-            onComplete={() => setAppState("dashboard")}
+            onComplete={handleReflectionComplete}
+            onBack={() => setAppState("dashboard")}
           />
         );
 
