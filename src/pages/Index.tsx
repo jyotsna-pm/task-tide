@@ -507,14 +507,6 @@ const Index = () => {
               )}
             </div>
 
-            {/* Floating Action Button */}
-            <Button 
-              className="fixed bottom-20 right-6 h-16 w-16 rounded-full shadow-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 z-50"
-              onClick={() => setShowAddTaskModal(true)}
-            >
-              <Plus className="h-7 w-7" />
-            </Button>
-
             {/* Bottom Navigation */}
             <Navigation 
               currentView={appState}
